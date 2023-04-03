@@ -31,13 +31,25 @@
     <div class="myBackGround">
         <div class="myBox">box</div>
         
+        <!-- LOOP THROUGH THE WALL LOCATIONS -->
+        
         @foreach (var location in _wallLocations)
         {
+            <!-- LOOP THROUGH WALLS (INDEXES -->
+            
             @foreach (var wall in location.Value)
             {
+                <!-- location.Key = the row which we are rendering i.e: 1 -->
+                <!-- wall = the index of the W -->
+                <!-- Take this value and multiply by the default value, in this case 100 to get the location -->
+                <!-- absolute position to force it to render where we say -->
                 <div style="background: red; height: 50px; width: 100px; position: absolute; left: @(100 * wall + "px"); top: @(100 * location.Key + "px")"></div>
             }
+            
+            <!-- END WALLS LOOP -->
         }
+        
+        <!-- END WALL LOCAITONS LOOP -->
     </div>
 
     <table>
@@ -80,6 +92,9 @@
     public string getbackGroundWidth { get => $"{backGroundWidth}px"; }
     public string getbackGroundHeight { get => $"{backGroundHeight}px"; }
 
+    /// This variable will store what row has walls and the location of the wall.
+    /// For example:
+    /// Row 1 would be -> 1, new List<int> { 1, 6 }
     private Dictionary<int, List<int>> _wallLocations = new();
 
     IList<INode> _nodes;
@@ -91,6 +106,7 @@
     private string _row4 = "NNNNNNNNNN";
     private string _row5 = "NNNNNNNNNG";
 
+    /// When the row1 value is set, run the detection (renderer) for the walls.
     string Row1
     {
         get => _row1;
@@ -141,6 +157,11 @@
         }
     }
 
+    /// Create a new list which is empty.
+    /// Get the index of a W from within the string which is provided for the row.
+    /// If it's found > -1, then add it to the list which is storing the indexes.
+    /// If the wall locations already has this key, just override it with the new walls.
+    /// If not, add it to the wall locations variable.
     public void DetectWallCollisions(int rowNumber, string rowValue)
     {
         var walls = new List<int>();
