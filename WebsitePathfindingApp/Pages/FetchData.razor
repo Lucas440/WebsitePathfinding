@@ -1,0 +1,118 @@
+﻿@using WebsitePathfindingApp.Classes;
+@using WebsitePathfindingApp.Classes.DataStructure;
+@using System.Collections;
+@page "/Pathfinding"
+<head>
+    <style>
+        .myBox{
+            background-color: black;
+            height: 50px;
+            width: 50px;
+            position : relative;
+            top: @getYPos;
+            left: @getXPos;
+        }
+        .myBackGround{
+            background-color : darkcyan;
+            width: @getbackGroundWidth;
+            height: @getbackGroundHeight;
+        }
+
+        tr {
+            display : flex;
+        }
+
+    </style>
+</head>
+
+<PageTitle>PathFinding</PageTitle>
+<body>
+    <div class="myBackGround">
+        <div class="myBox">box</div>
+    </div>
+
+    <table>
+        <tr>
+            
+            <td><input type="text" @bind="Row1" maxlength="10">Row 1</td>
+        </tr>
+        <tr>
+            
+            <td><input type="text" @bind="Row2" maxlength="10">Row 2</td>
+        </tr>
+        <tr>          
+            <td><input type="text" @bind="Row3" maxlength="10">Row 3</td>
+        </tr>
+        <tr>         
+            <td><input type="text" @bind="Row4" maxlength="10">Row 4</td>
+        </tr>
+        <tr>
+            <td><input type="text" @bind="Row5" maxlength="10">Row 5</td>
+        </tr>
+    </table>
+
+
+
+    <button @onclick="OnButtonClick">Move!</button>
+</body>
+@code {
+    int _xPos = 150, _yPos = 200;
+
+    int backGroundWidth = 1000, backGroundHeight = 500;
+
+    bool clicked = false;
+    DataStuctureGenorator _genorator;
+
+    private System.Threading.Timer? _timer;
+
+    public string getXPos { get => $"{_xPos}px"; }
+    public string getYPos { get => $"{_yPos}px"; }
+
+    public string getbackGroundWidth { get => $"{backGroundWidth}px"; }
+    public string getbackGroundHeight { get => $"{backGroundHeight}px"; }
+
+    IList<INode> _nodes;
+    Stack<INode> _pathStack;
+
+    string Row1 { get; set; } = "SNNNNNNNNN";
+    string Row2 { get; set; } = "NNNNNNNNNN";
+    string Row3 { get; set; } = "NNNNNNNNNN";
+    string Row4 { get; set; } = "NNNNNNNNNN";
+    string Row5 { get; set; } = "NNNNNNNNNG";
+
+    public async void OnButtonClick()
+    {
+        if (clicked == false) 
+        {
+            string[] rowArray = new string[]
+            {
+                Row1, Row2,Row3,Row4,Row5
+            };
+
+
+            _genorator = new DataStuctureGenorator(backGroundHeight, backGroundWidth, rowArray);
+            _nodes = _genorator.getPath();
+            _pathStack = new Stack<INode>();
+
+            foreach(INode n in _nodes)
+            {
+                _pathStack.Push(n);
+            }
+
+            clicked = true;
+        }
+
+
+        _timer = new System.Threading.Timer(async (object? stateInfo) =>
+        {
+            if (_pathStack.Count != 0)
+            {
+                INode temp = _pathStack.Pop();
+
+                _xPos = (int)temp.Location.X;
+                _yPos = (int)temp.Location.Y;
+            }
+                await InvokeAsync(StateHasChanged); // NOTE: MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
+            }, new System.Threading.AutoResetEvent(false), 200, 200); // fire every 2000 milliseconds
+        }
+    }
