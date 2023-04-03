@@ -43,7 +43,7 @@
                 <!-- wall = the index of the W -->
                 <!-- Take this value and multiply by the default value, in this case 100 to get the location -->
                 <!-- absolute position to force it to render where we say -->
-                <div style="background: red; height: 50px; width: 100px; position: absolute; left: @(100 * wall + "px"); top: @(100 * location.Key + "px")"></div>
+                <div style="background: red; height: 100px; width: 100px; position: absolute; left: @(100 * wall + "px"); top: @(100 * location.Key + "px")"></div>
             }
             
             <!-- END WALLS LOOP -->
@@ -116,7 +116,7 @@
             _row1 = value;
         }
     }
-    
+
     string Row2
     {
         get => _row2;
@@ -126,7 +126,7 @@
             _row2 = value;
         }
     }
-    
+
     string Row3
     {
         get => _row3;
@@ -136,7 +136,7 @@
             _row3 = value;
         }
     }
-    
+
     string Row4
     {
         get => _row4;
@@ -146,7 +146,7 @@
             _row4 = value;
         }
     }
-    
+
     string Row5
     {
         get => _row5;
@@ -165,7 +165,7 @@
     public void DetectWallCollisions(int rowNumber, string rowValue)
     {
         var walls = new List<int>();
-        
+
         for (var i = rowValue.IndexOf("W", StringComparison.Ordinal); i > -1; i = rowValue.IndexOf("W", i + 1, StringComparison.Ordinal))
         {
             walls.Add(i);
@@ -176,7 +176,7 @@
             _wallLocations[rowNumber - 1] = walls;
             return;
         }
-        
+
         _wallLocations.Add(rowNumber - 1, walls);
     }
 
@@ -212,7 +212,13 @@
                 _xPos = (int)temp.Location.X;
                 _yPos = (int)temp.Location.Y;
             }
-                await InvokeAsync(StateHasChanged); // NOTE: MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
-            }, new System.Threading.AutoResetEvent(false), 200, 200); // fire every 2000 milliseconds
+            await InvokeAsync(StateHasChanged); // NOTE: MUST CALL StateHasChanged() BECAUSE THIS IS TRIGGERED BY A TIMER INSTEAD OF A USER EVENT
+        }, new System.Threading.AutoResetEvent(false), 200, 200); // fire every 2000 milliseconds
+
+        if(_pathStack.Count == 0)
+        {
+            clicked = false;
         }
+    }
+
     }
