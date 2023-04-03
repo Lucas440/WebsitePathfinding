@@ -13,6 +13,7 @@
             left: @getXPos;
         }
         .myBackGround{
+            position:  relative;
             background-color : darkcyan;
             width: @getbackGroundWidth;
             height: @getbackGroundHeight;
@@ -29,6 +30,14 @@
 <body>
     <div class="myBackGround">
         <div class="myBox">box</div>
+        
+        @foreach (var location in _wallLocations)
+        {
+            @foreach (var wall in location.Value)
+            {
+                <div style="background: red; height: 50px; width: 100px; position: absolute; left: @(100 * wall + "px"); top: @(100 * location.Key + "px")"></div>
+            }
+        }
     </div>
 
     <table>
@@ -71,14 +80,84 @@
     public string getbackGroundWidth { get => $"{backGroundWidth}px"; }
     public string getbackGroundHeight { get => $"{backGroundHeight}px"; }
 
+    private Dictionary<int, List<int>> _wallLocations = new();
+
     IList<INode> _nodes;
     Stack<INode> _pathStack;
 
-    string Row1 { get; set; } = "SNNNNNNNNN";
-    string Row2 { get; set; } = "NNNNNNNNNN";
-    string Row3 { get; set; } = "NNNNNNNNNN";
-    string Row4 { get; set; } = "NNNNNNNNNN";
-    string Row5 { get; set; } = "NNNNNNNNNG";
+    private string _row1 = "SNNNNNNNNN";
+    private string _row2 = "NNNNNNNNNN";
+    private string _row3 = "NNNNNNNNNN";
+    private string _row4 = "NNNNNNNNNN";
+    private string _row5 = "NNNNNNNNNG";
+
+    string Row1
+    {
+        get => _row1;
+        set
+        {
+            DetectWallCollisions(1, value);
+            _row1 = value;
+        }
+    }
+    
+    string Row2
+    {
+        get => _row2;
+        set
+        {
+            DetectWallCollisions(2, value);
+            _row2 = value;
+        }
+    }
+    
+    string Row3
+    {
+        get => _row3;
+        set
+        {
+            DetectWallCollisions(3, value);
+            _row3 = value;
+        }
+    }
+    
+    string Row4
+    {
+        get => _row4;
+        set
+        {
+            DetectWallCollisions(4, value);
+            _row4 = value;
+        }
+    }
+    
+    string Row5
+    {
+        get => _row5;
+        set
+        {
+            DetectWallCollisions(5, value);
+            _row5 = value;
+        }
+    }
+
+    public void DetectWallCollisions(int rowNumber, string rowValue)
+    {
+        var walls = new List<int>();
+        
+        for (var i = rowValue.IndexOf("W", StringComparison.Ordinal); i > -1; i = rowValue.IndexOf("W", i + 1, StringComparison.Ordinal))
+        {
+            walls.Add(i);
+        }
+
+        if (_wallLocations.ContainsKey(rowNumber - 1))
+        {
+            _wallLocations[rowNumber - 1] = walls;
+            return;
+        }
+        
+        _wallLocations.Add(rowNumber - 1, walls);
+    }
 
     public async void OnButtonClick()
     {
